@@ -1,4 +1,5 @@
 
+import org.junit.Assert;
 import org.junit.Test;
 //import org.testng.annotations.Test;
         import io.restassured.RestAssured;
@@ -76,15 +77,38 @@ public class RestAssuredTest {
         String token="c0d2f28135872130984acf1ccf39461203f233db";
         RestAssured
                 .given()
-                .header( "Authorization", "Bearer "+token).header("Content-Type","application/json").get("https://api.todoist.com/rest/v1/tasks/5081923746")
+                .header( "Authorization", "Bearer "+token)
+                .header("Content-Type","application/json")
+                .get("https://api.todoist.com/rest/v1/tasks/5081923746")
                 .then()
                 .assertThat()
-                .body("content", equalTo("Click this task to see more details")
+                .body("content", equalTo("Click this task to see more details"))
                 .log()
                 .all();
 
     }
 
+    @Test
+    public void deleteRecord() {
+
+        Long id = 5081923756L;
+
+        RestAssured.baseURI = "https://api.todoist.com/rest/v1/tasks/5081923756";
+        RequestSpecification request = RestAssured.given();
+
+        // Add a header stating the Request body is a JSON
+        request.header("Content-Type", "application/json");
+
+        // Delete the request and check the response
+        Response response = request.delete("/delete/"+ id);
+
+        int statusCode = response.getStatusCode();
+        System.out.println(response.asString());
+        Assert.assertEquals(statusCode,404);
+
+        String jsonString =response.asString();
+        Assert.assertEquals(jsonString.contains("successfully! deleted Records"), false);
+    }
 
 
 }
